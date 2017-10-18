@@ -73,6 +73,7 @@ for server in $AUTO_SSH_CONFIG; do
 		PASS=`echo $server | awk -F\| '{ print $4 }'`
 		PORT=`echo $server | awk -F\| '{ print $5 }'`
 		ISBASTION=`echo $server | awk -F\| '{ print $6 }'`
+        V54="!v54!"
 		FILE='/tmp/.login.sh'
 		if [ "$PORT" == "" ]; then
 			PORT=10022
@@ -81,8 +82,12 @@ for server in $AUTO_SSH_CONFIG; do
         	echo 'set timeout 30' >> $FILE
         	echo "spawn ssh -p$PORT -l "$NAME $IP >> $FILE
         	if [ "$PASS" != "" ]; then
-	        	echo 'expect "password:"' >> $FILE
+	        	echo 'expect "Please login:"' >> $FILE
+	        	echo 'send   '$NAME"\r" >> $FILE
+	        	echo 'expect "Password:"' >> $FILE
 	        	echo 'send   '$PASS"\r" >> $FILE
+	        	echo 'expect "ruckus>"' >> $FILE
+	        	echo 'send   '$V54"\r" >> $FILE
 				if [ "$2" == 'sudo' ]; then
 					echo 'expect "@"' >> $FILE
 					echo 'send   "sudo su\r"' >> $FILE
